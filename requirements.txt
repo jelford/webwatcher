@@ -1,0 +1,4 @@
+attrs==17.3.0
+requests==2.18.4
+typing-extensions==3.6.2
+docopt==0.6.2
