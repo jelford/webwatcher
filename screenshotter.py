@@ -48,7 +48,10 @@ class Screenshotter:
                 )
             except subprocess.TimeoutExpired:
                 return None
-        return Screenshot(path=output.name)
+
+        return Screenshot(
+                content_hash=file_hash(output.name).hexdigest(), 
+                content_path=output.name)
 
 
 def _download_firefox_package():
@@ -91,12 +94,17 @@ def _download_firefox_package():
 def _path_to_modern_firefox() -> str:
     ff_path = shutil.which('firefox')
     if ff_path:
-        version_text = subprocess.check_output([ff_path, '--version'])
-        vnumber = re.search(b'Mozilla Firefox ([\.\d]+)', version_text)
-        if vnumber:
-            version = vnumber.group(1)
-            parsed_version_info = version.split(b'.')
-            if parsed_version_info >= [b'57', b'0']:
-                return ff_path
+        try:
+            version_text = \
+                subprocess.check_output([ff_path, '--version'], timeout=1)
+        except:
+            pass
+        else:
+            vnumber = re.search(b'Mozilla Firefox ([\.\d]+)', version_text)
+            if vnumber:
+                version = vnumber.group(1)
+                parsed_version_info = version.split(b'.')
+                if parsed_version_info >= [b'57', b'0']:
+                    return ff_path
 
     return _download_firefox_package()

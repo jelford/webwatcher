@@ -37,9 +37,12 @@ def get_previous_observation(storage: Storage, page: PageUnderObsevation) \
     else:
         persisted_data = persisted_data[0]
 
-    screenshot_path = persisted_data.fetch_local('screenshot')
-    screenshot = Screenshot(screenshot_path) \
-        if screenshot_path is not None else None
+    screenshot_content_hash = persisted_data['screenshot_content']
+    if screenshot_content_hash is not None:
+        screenshot = Screenshot(
+                        content_hash=screenshot_content_hash)
+    else:
+        screenshot = None
 
     return PageObservation(
         url=persisted_data['url'],

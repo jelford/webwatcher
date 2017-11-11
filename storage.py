@@ -13,11 +13,6 @@ from urllib.parse import urlparse, unquote
 from filehash import file_hash
 
 
-class LocalFile(Protocol):
-    def get_url(self) -> str:
-        ...
-
-
 class Persistable(Protocol):
     def artefacts(self) -> Dict[str, str]:
         ...
@@ -103,10 +98,15 @@ class StorageQuery:
 
     def fetch(self):
         try:
+
             all_data = []
-            with open(self.storage._meta_info_path, 'r', encoding='utf-8') as f:
+            with open(self.storage._meta_info_path,
+                      mode='r',
+                      encoding='utf-8') as f:
+
                 for line in f:
                     all_data.append(_de_jsonsafe(json.loads(line)))
+
         except FileNotFoundError:
             return []
 

@@ -35,7 +35,7 @@ class ScreenshotDiff:
 
     def __str__(self):
         return ('ScreenshotDiff('
-                'old={},'
+                'old(hash)={},'
                 ' new={},'
                 ' comparison={})')\
                 .format(self.old, self.new, self.comparison)
@@ -46,23 +46,20 @@ def _do_diff_on_screenshots(old_screenshot, new_screenshot):
         return None
 
     if old_screenshot is not None:
-        old_path = old_screenshot.path
-        old_hash = file_hash(old_path).digest()
+        old_hash = old_screenshot.content_hash
     else:
-        old_hash = old_path = None
+        old_hash = None
 
     if new_screenshot is not None:
-        new_path = new_screenshot.path
+        new_path = new_screenshot.content_path
         new_hash = file_hash(new_path).digest()
     else:
-        new_hash = new_path = None
+        new_path = new_hash = None
 
     if old_hash == new_hash:
         return None
 
-
-
-    return ScreenshotDiff(old_path, new_path, None)
+    return ScreenshotDiff(old_hash, new_path, None)
 
 
 class Diffa:

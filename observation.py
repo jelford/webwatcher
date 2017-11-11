@@ -4,20 +4,21 @@ import attr
 
 
 class Screenshot:
-    def __init__(self, path):
-        self.path = path
+    def __init__(self, content_hash, content_path=None):
+        self.content_hash = content_hash
+        self.content_path = content_path
 
     def __hash__(self):
-        return hash(self.path)
+        return hash(self.content_hash)
 
     def __eq__(self, other):
         try:
-            return self.path == other.path
+            return self.content_hash == other.content_hash
         except AttributeError:
             return False
 
     def __str__(self):
-        return 'Screenshot{{path={path}}}'.format(path=self.path)
+        return 'Screenshot{{hash={hash}}}'.format(hash=self.content_hash)
 
 
 class PageObservation:
@@ -34,15 +35,21 @@ class PageObservation:
         self.raw_content_location = raw_content_location
 
     def artefacts(self):
-        return {k: v for k, v in {
-            'screenshot': self.screenshot.path if self.screenshot else None,
-            'raw_content': self.raw_content_location
-        }.items() if v is not None}
+        artefacts = dict()
+        if self.screenshot is not None:
+            artefacts['screenshot'] = self.screenshot.content_path
+        if self.raw_content_location is not None:
+            artefacts['raw_content'] = self.raw_content_location
+
+        return artefacts
 
     def get_meta_info(self):
-        return {
+        meta = {
             'type': 'observation',
             'url': self.url,
             'timestamp': self.observation_time,
-            'was_available': self.availability
+            'was_available': self.availability,
         }
+        if self.screenshot:
+            meta['screenshot_content'] = self.screenshot.content_hash
+        return meta
