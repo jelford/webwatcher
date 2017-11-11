@@ -1,6 +1,7 @@
 from hashlib import sha256
 import subprocess
 
+from filehash import file_hash
 from observation import PageObservation
 
 
@@ -46,18 +47,20 @@ def _do_diff_on_screenshots(old_screenshot, new_screenshot):
 
     if old_screenshot is not None:
         old_path = old_screenshot.path
-        old_hash = _file_hash(old_path)
+        old_hash = file_hash(old_path).digest()
     else:
         old_hash = old_path = None
 
     if new_screenshot is not None:
         new_path = new_screenshot.path
-        new_hash = _file_hash(new_path)
+        new_hash = file_hash(new_path).digest()
     else:
         new_hash = new_path = None
 
     if old_hash == new_hash:
         return None
+
+
 
     return ScreenshotDiff(old_path, new_path, None)
 
@@ -89,24 +92,3 @@ class Diffa:
 
         return d if d.differences() else None
 
-
-def _read_file_chunks(fileobject):
-    while True:
-        chunk = fileobject.read(8192)
-        if not chunk:
-            break
-        yield chunk
-
-
-def _file_hash(path):
-
-    hasher = sha256()
-    try:
-        with open(path, 'rb') as f:
-            for chunk in _read_file_chunks(f):
-                hasher.update(chunk)
-    except FileNotFoundError:
-        raise ComparisonFailureException(
-                'Unable to open {path} for hashing'.format(path=path))
-
-    return hasher.hexdigest()

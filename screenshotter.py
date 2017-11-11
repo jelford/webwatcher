@@ -1,71 +1,80 @@
 import functools
 import os
+from pathlib import Path
 import re
 import shutil
 import subprocess
 import tempfile
+import atexit
 
 import attr
 import requests
 
+from filehash import file_hash
 from observation import Screenshot
 
 
 _FIREFOX_BETA_DOWNLOAD_URL = \
     'https://ftp.mozilla.org/pub/firefox/releases/' \
     '57.0b14/linux-x86_64/en-US/firefox-57.0b14.tar.bz2'
+_FIREFOX_BETA_DOWNLOAD_HASH = \
+    '772c307edcbdab9ba9bf652c44b69b6c014b831f28cf91a958de67ea6d42ba5f'
 
 
-def take_screenshot_of(url: str) -> Screenshot:
-    with tempfile.TemporaryDirectory() as profile_dir:
-        output = tempfile.NamedTemporaryFile(
-            delete=False, suffix='_screenshot.png')
+class Screenshotter:
+    def __init__(self, temp_dir):
+        self.temp_dir = temp_dir
+
+    def take_screenshot_of(self, url: str) -> Screenshot:
+        output = tempfile.NamedTemporaryFile(suffix='.png', dir=self.temp_dir, delete=False)
         output.close()
-        ff_path = _path_to_modern_firefox()
-        try:
-            subprocess.check_call(
-                [
-                    ff_path,
-                    '--screenshot',
-                    output.name,
-                    url,
-                    '--no-remote',
-                    '--profile',
-                    profile_dir
-                ],
-                stdout=None,
-                stderr=None,
-                timeout=2
-            )
-        except subprocess.TimeoutExpired:
-            return None
-    return Screenshot(path=output.name)
+
+        with tempfile.TemporaryDirectory(suffix='_ff_profile') as profile_dir:
+            ff_path = _path_to_modern_firefox()
+            try:
+                subprocess.check_call(
+                    [
+                        ff_path,
+                        '--screenshot',
+                        output.name,
+                        url,
+                        '--no-remote',
+                        '--profile',
+                        profile_dir
+                    ],
+                    stdout=None,
+                    stderr=None,
+                    timeout=2
+                )
+            except subprocess.TimeoutExpired:
+                return None
+        return Screenshot(path=output.name)
 
 
 def _download_firefox_package():
-    webwatcher_cache_dir = os.path.join(
-        os.path.expanduser('~'),
-        '.cache',
-        'webwatcher')
-    extracted_firefox_bin = os.path.join(webwatcher_cache_dir,
-                                         'firefox',
-                                         'firefox')
-
-    if os.path.isfile(extracted_firefox_bin):
+    webwatcher_cache_dir = Path.home() / '.cache' / 'webwatcher'
+    extracted_firefox_bin = webwatcher_cache_dir / 'firefox' / 'firefox'
+   
+    if extracted_firefox_bin.is_file():
         if os.access(extracted_firefox_bin, os.X_OK):
             return extracted_firefox_bin
 
-    download_cache_dir = os.path.join(
-        webwatcher_cache_dir,
-        'downloads')
+    download_cache_dir = webwatcher_cache_dir / 'downloads'
     try:
         os.makedirs(download_cache_dir)
     except FileExistsError:
         pass
 
-    download_path = os.path.join(download_cache_dir, 'firefox.tar.bz2')
+    download_path = download_cache_dir / 'firefox.tar.bz2'
 
-    if not os.path.exists(download_path):
+    if download_path.exists():
+        downloaded_hash = file_hash(download_path).hexdigest()
+        need_to_download = downloaded_hash != _FIREFOX_BETA_DOWNLOAD_HASH
+        print('Need to download firefox as local copy doesnt hash right - got {}'.format(downloaded_hash))
+    else:
+        need_to_download = True
+
+    if need_to_download:
         firefox_download_url = os.getenv('FIREFOX_DOWNLOAD_URL') or \
             _FIREFOX_BETA_DOWNLOAD_URL
         with open(download_path, 'wb') as download_file:

@@ -15,12 +15,9 @@ from requests.exceptions import ConnectionError
 
 from diffa import Diffa
 from observation import PageObservation, Screenshot
-from screenshotter import take_screenshot_of
+from screenshotter import Screenshotter
 from storage import Storage
-
-http_session = requests.session()
-
-storage = Storage()
+from webfetcher import WebFetcher
 
 
 class PageUnderObsevation:
@@ -28,7 +25,8 @@ class PageUnderObsevation:
         self.url = url
 
 
-def get_previous_observation(page: PageUnderObsevation) -> PageObservation:
+def get_previous_observation(storage: Storage, page: PageUnderObsevation) \
+                            -> PageObservation:
     persisted_data = storage.find(url=page.url) \
         .having('timestamp') \
         .order_by('timestamp',
@@ -52,26 +50,21 @@ def get_previous_observation(page: PageUnderObsevation) -> PageObservation:
     )
 
 
-def observe(page: PageUnderObsevation) -> PageObservation:
-    try:
-        response = http_session.get(page.url, stream=True)
-    except ConnectionError:
-        raw_content = None
-        was_available = False
-    else:
-        was_available = response.status_code in range(200, 300)
-        raw_content_file = tempfile.NamedTemporaryFile(delete=False)
-        shutil.copyfileobj(response.raw, raw_content_file)
-        raw_content = raw_content_file.name
+class WebWatcher:
+    def __init__(self, screenshotter, webfetcher):
+        self.screenshotter = screenshotter
+        self.webfetcher = webfetcher
 
-    screenshot = take_screenshot_of(page.url)
+    def observe(self, page: PageUnderObsevation) -> PageObservation:
+        was_available, raw_content = self.webfetcher.fetch(page.url)
+        screenshot = self.screenshotter.take_screenshot_of(page.url)
 
-    return PageObservation(
-        url=page.url,
-        observation_time=datetime.now(timezone.utc),
-        availability=was_available,
-        screenshot=screenshot,
-        raw_content_location=raw_content)
+        return PageObservation(
+            url=page.url,
+            observation_time=datetime.now(timezone.utc),
+            availability=was_available,
+            screenshot=screenshot,
+            raw_content_location=raw_content)
 
 
 def watched_pages() -> Collection[PageUnderObsevation]:
@@ -79,35 +72,42 @@ def watched_pages() -> Collection[PageUnderObsevation]:
             (
                 'https://google.com',
                 'http://icanhazip.com',
-                'http://localhost:8080'
+                'http://localhost:8080',
     )]
 
 
 def main() -> None:
-    diffa = Diffa()
-    diffs = dict()
-    errors = []
-    for page in watched_pages():
-        try:
-            observation = observe(page)
-            previous_observation = get_previous_observation(page)
-            diff = diffa.diff(observation, previous_observation)
-            if diff:
-                diffs[page.url] = diff
-            storage.persist(observation)
-        except Exception as ex:
-            msg = getattr(ex, 'msg', str(type(ex)))
-            errors.append('{} while checking on {}'.format(msg, page.url))
+    with tempfile.TemporaryDirectory() as temp_dir:
+        diffa = Diffa()
+        storage = Storage()
+        screenshotter = Screenshotter(temp_dir)
+        fetcher = WebFetcher(temp_dir)
+        watcher = WebWatcher(screenshotter, fetcher)
+        diffs = dict()
+        errors = []
+        for page in watched_pages():
+            try:
+                observation = watcher.observe(page)
+                previous_observation = get_previous_observation(storage, page)
+                diff = diffa.diff(observation, previous_observation)
+                if diff:
+                    diffs[page.url] = diff
+                storage.persist(observation)
+            except Exception as ex:
+                msg = getattr(ex, 'msg', str(type(ex)))
+                errors.append(
+                    ('{} while checking on {}'.format(msg, page.url), ex))
 
-    for url, diff in diffs.items():
-        print('Differences in {url}'.format(url=url))
-        for k, v in diff.differences().items():
-            print('\t{k}: {v}'.format(**locals()))
+        for url, diff in diffs.items():
+            print('Differences in {url}'.format(url=url))
+            for k, v in diff.differences().items():
+                print('\t{k}: {v}'.format(**locals()))
 
-    if errors:
-        print('Errors:')
-    for e in errors:
-        print('\t', e)
+        if errors:
+            print('Errors:')
+        for msg, e in errors:
+            print('\t', msg)
+            raise e
 
 if __name__ == '__main__':
     main()

@@ -4,13 +4,13 @@ from typing_extensions import Protocol
 
 import base64
 from datetime import datetime, date
-from hashlib import sha256
 import json
 import os
 from pathlib import Path
 import shutil
 from urllib.parse import urlparse, unquote
-import uuid
+
+from filehash import file_hash
 
 
 class LocalFile(Protocol):
@@ -26,6 +26,11 @@ class Persistable(Protocol):
         ...
 
 
+class StorageFailureException(Exception):
+    def __init__(self, msg):
+        self.msg = msg
+
+
 class Storage:
     _storage_dir = Path.home() / '.local' / 'webwatcher' / 'storage'
     _meta_info_path = _storage_dir / 'record.dat'
@@ -39,11 +44,16 @@ class Storage:
 
         persisted_locations = dict()
         for name, location in persistable.artefacts().items():
-            storage_filename = _storage_filename_for(location)
-            storage_location = self._artefact_storage_dir / storage_filename
+            try:
+                storage_filename = _storage_filename_for(location)
+                storage_location = \
+                    self._artefact_storage_dir / storage_filename
 
-            shutil.move(location, storage_location)
-            persisted_locations[name] = storage_location.as_uri()
+                shutil.copy(location, storage_location)
+                persisted_locations[name] = storage_location.as_uri()
+            except:
+                raise StorageFailureException(
+                        msg='While persisting {}'.format(name))
 
         meta_info = _json_safe(persistable.get_meta_info())
         if persisted_locations:
@@ -159,10 +169,7 @@ def _storage_filename_for(existing_file):
     if os.path.getsize(existing_file) == 0:
         return '_empty_file'
 
-    hasher = sha256()
-    with open(existing_file, 'rb') as f:
-        for chunk in _read_file_chunks(f):
-            hasher.update(chunk)
+    hasher = file_hash(existing_file)
 
     return base64.b64encode(
             hasher.digest(),
