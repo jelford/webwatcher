@@ -38,7 +38,7 @@ class ScreenshotDiff:
                 'old(hash)={},'
                 ' new={},'
                 ' comparison={})')\
-                .format(self.old, self.new, self.comparison)
+            .format(self.old, self.new, self.comparison)
 
 
 def _do_diff_on_screenshots(old_screenshot, new_screenshot):
@@ -70,17 +70,17 @@ class Diffa:
         if old_observation is None:
             print('No previous found')
             return PageDiff(
-                    availability=new_observation.availability,
-                    screenshot_diff=new_observation.screenshot,
-                    content_diff=new_observation.raw_content_location)
+                availability=new_observation.availability,
+                screenshot_diff=new_observation.screenshot,
+                content_diff=new_observation.raw_content_location)
 
         availability = new_observation.availability \
             if (new_observation.availability != old_observation.availability) \
             else None
 
         screenshot_diff = _do_diff_on_screenshots(
-                            old_observation.screenshot, 
-                            new_observation.screenshot)
+            old_observation.screenshot,
+            new_observation.screenshot)
 
         d = PageDiff(
             availability=availability,
@@ -88,4 +88,3 @@ class Diffa:
             content_diff=None)
 
         return d if d.differences() else None
-

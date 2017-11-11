@@ -26,7 +26,8 @@ class Screenshotter:
         self.temp_dir = temp_dir
 
     def take_screenshot_of(self, url: str) -> Screenshot:
-        output = tempfile.NamedTemporaryFile(suffix='.png', dir=self.temp_dir, delete=False)
+        output = tempfile.NamedTemporaryFile(
+            suffix='.png', dir=self.temp_dir, delete=False)
         output.close()
 
         with tempfile.TemporaryDirectory(suffix='_ff_profile') as profile_dir:
@@ -50,14 +51,14 @@ class Screenshotter:
                 return None
 
         return Screenshot(
-                content_hash=file_hash(output.name).hexdigest(), 
-                content_path=output.name)
+            content_hash=file_hash(output.name).hexdigest(),
+            content_path=output.name)
 
 
 def _download_firefox_package():
     webwatcher_cache_dir = Path.home() / '.cache' / 'webwatcher'
     extracted_firefox_bin = webwatcher_cache_dir / 'firefox' / 'firefox'
-   
+
     if extracted_firefox_bin.is_file():
         if os.access(extracted_firefox_bin, os.X_OK):
             return extracted_firefox_bin
@@ -73,7 +74,6 @@ def _download_firefox_package():
     if download_path.exists():
         downloaded_hash = file_hash(download_path).hexdigest()
         need_to_download = downloaded_hash != _FIREFOX_BETA_DOWNLOAD_HASH
-        print('Need to download firefox as local copy doesnt hash right - got {}'.format(downloaded_hash))
     else:
         need_to_download = True
 
