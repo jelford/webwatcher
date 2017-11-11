@@ -4,7 +4,7 @@ from typing_extensions import Protocol
 
 import base64
 from datetime import datetime, date
-from hashlib import blake2b
+from hashlib import sha256
 import json
 import os
 from pathlib import Path
@@ -159,7 +159,7 @@ def _storage_filename_for(existing_file):
     if os.path.getsize(existing_file) == 0:
         return '_empty_file'
 
-    hasher = blake2b()
+    hasher = sha256()
     with open(existing_file, 'rb') as f:
         for chunk in _read_file_chunks(f):
             hasher.update(chunk)

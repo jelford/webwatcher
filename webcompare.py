@@ -97,7 +97,7 @@ def main() -> None:
             storage.persist(observation)
         except Exception as ex:
             msg = getattr(ex, 'msg', str(type(ex)))
-            errors.append(f'{msg} while checking on {page.url}')
+            errors.append('{} while checking on {}'.format(msg, page.url))
 
     for url, diff in diffs.items():
         print('Differences in {url}'.format(url=url))

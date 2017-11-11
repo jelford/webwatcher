@@ -1,4 +1,4 @@
-from hashlib import blake2b
+from hashlib import sha256
 import subprocess
 
 from observation import PageObservation
@@ -33,10 +33,11 @@ class ScreenshotDiff:
         self.comparison = diff_file
 
     def __str__(self):
-        return f'ScreenshotDiff('\
-                    f'old={self.old},'\
-                    f' new={self.new},'\
-                    f' comparison={self.comparison})'
+        return ('ScreenshotDiff('
+                'old={},'
+                ' new={},'
+                ' comparison={})')\
+                .format(self.old, self.new, self.comparison)
 
 
 def _do_diff_on_screenshots(old_screenshot, new_screenshot):
@@ -99,12 +100,13 @@ def _read_file_chunks(fileobject):
 
 def _file_hash(path):
 
-    hasher = blake2b()
+    hasher = sha256()
     try:
         with open(path, 'rb') as f:
             for chunk in _read_file_chunks(f):
                 hasher.update(chunk)
     except FileNotFoundError:
-        raise ComparisonFailureException(f'Unable to open {path} for hashing')
+        raise ComparisonFailureException(
+                'Unable to open {path} for hashing'.format(path=path))
 
     return hasher.hexdigest()
