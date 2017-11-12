@@ -1,3 +1,4 @@
 mypy
 autopep8
 pep8
+pytest==3.2.3
