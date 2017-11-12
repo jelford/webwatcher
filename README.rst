@@ -10,6 +10,7 @@ Description
 -----------
 
 ``webwatcher`` does roughly the following:
+
 * Query a list of web pages
 * Take screenshots of them
 * Let you know which ones have changed since last time
