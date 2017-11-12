@@ -13,11 +13,11 @@ import attr
 import requests
 from requests.exceptions import ConnectionError
 
-from diffa import Diffa
-from observation import PageObservation, Screenshot
-from screenshotter import Screenshotter
-from storage import Storage
-from webfetcher import WebFetcher
+from webwatcher.diffa import Diffa
+from webwatcher.observation import PageObservation, Screenshot
+from webwatcher.screenshotter import Screenshotter
+from webwatcher.storage import Storage
+from webwatcher.webfetcher import WebFetcher
 
 
 class PageUnderObsevation:

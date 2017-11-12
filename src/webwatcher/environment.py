@@ -10,8 +10,6 @@ from typing import Callable
 
 import appdirs
 
-from __version__ import version
-
 
 def cache_folder(name) -> Path:
     d = _cache_root() / name

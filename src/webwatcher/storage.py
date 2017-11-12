@@ -9,8 +9,8 @@ import os
 import shutil
 from urllib.parse import urlparse, unquote
 
-import environment
-from filehash import file_hash
+from webwatcher.environment import data_folder
+from webwatcher.filehash import file_hash
 
 
 class Persistable(Protocol):
@@ -27,7 +27,7 @@ class StorageFailureException(Exception):
 
 
 class Storage:
-    _storage_dir = environment.data_folder('storage')
+    _storage_dir = data_folder('storage')
     _meta_info_path = _storage_dir / 'record.dat'
     _artefact_storage_dir = _storage_dir / 'artefacts'
 

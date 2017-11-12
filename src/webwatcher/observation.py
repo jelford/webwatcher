@@ -1,7 +1,5 @@
 from datetime import datetime
 
-import attr
-
 
 class Screenshot:
     def __init__(self, content_hash, content_path=None):

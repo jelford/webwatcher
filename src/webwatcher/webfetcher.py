@@ -4,7 +4,7 @@ from requests.exceptions import ConnectionError
 import shutil
 import tempfile
 
-from http_session import http_session
+from webwatcher.http_session import http_session
 
 
 class WebFetcher:

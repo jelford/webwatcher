@@ -10,10 +10,10 @@ import tempfile
 import attr
 import requests
 
-import environment
-from filehash import file_hash
-from http_session import http_session
-from observation import Screenshot
+from webwatcher.environment import cache_folder
+from webwatcher.filehash import file_hash
+from webwatcher.http_session import http_session
+from webwatcher.observation import Screenshot
 
 
 _FIREFOX_BETA_DOWNLOAD_URL = \
@@ -61,14 +61,14 @@ class Screenshotter:
 
 
 def _download_firefox_package():
-    firefox_extraction_path = environment.cache_folder('firefox')
+    firefox_extraction_path = cache_folder('firefox')
     extracted_firefox_bin = firefox_extraction_path / 'firefox' / 'firefox'
 
     if extracted_firefox_bin.is_file():
         if os.access(extracted_firefox_bin, os.X_OK):
             return extracted_firefox_bin
 
-    download_cache_dir = environment.cache_folder('downloads')
+    download_cache_dir = cache_folder('downloads')
     try:
         os.makedirs(download_cache_dir)
     except FileExistsError:

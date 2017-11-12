@@ -1,8 +1,8 @@
 from hashlib import sha256
 import subprocess
 
-from filehash import file_hash
-from observation import PageObservation
+from webwatcher.filehash import file_hash
+from webwatcher.observation import PageObservation
 
 
 class ComparisonFailureException(Exception):
