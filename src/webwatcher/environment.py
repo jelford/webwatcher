@@ -56,7 +56,6 @@ def _appdir_with_override(
 
 def _data_root() -> Path:
     r = _appdir_with_override('DATA_ROOT', appdirs.user_data_dir('webwatcher'))
-    print('Setting up data root:', r)
     return r
 
 

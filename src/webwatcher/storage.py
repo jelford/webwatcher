@@ -27,9 +27,10 @@ class StorageFailureException(Exception):
 
 
 class Storage:
-    _storage_dir = data_folder('storage')
-    _meta_info_path = _storage_dir / 'record.dat'
-    _artefact_storage_dir = _storage_dir / 'artefacts'
+    def __init__(self):
+        self._storage_dir = data_folder('storage')
+        self._meta_info_path = self._storage_dir / 'record.dat'
+        self._artefact_storage_dir = self._storage_dir / 'artefacts'
 
     def persist(self, persistable: Persistable):
         try:

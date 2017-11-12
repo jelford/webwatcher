@@ -1,0 +1,9 @@
+
+[site.google]
+url="https://google.com"
+
+[site.icanhazip]
+url="https://icanhazip.com"
+
+[site.xkcd]
+url="https://xkcd.com"
