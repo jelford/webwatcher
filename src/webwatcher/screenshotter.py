@@ -22,6 +22,24 @@ _FIREFOX_BETA_DOWNLOAD_HASH = \
     '772c307edcbdab9ba9bf652c44b69b6c014b831f28cf91a958de67ea6d42ba5f'
 
 
+def _call_quietly(args, timeout) -> None:
+    p = subprocess.Popen(args,
+                         stdout=subprocess.PIPE,
+                         stderr=subprocess.PIPE)
+    try:
+        stdout, stderr = p.communicate(input=None, timeout=timeout)
+    except subprocess.TimeoutExpired:
+        p.kill()
+        raise
+
+    if p.returncode != 0:
+        raise subprocess.CalledProcessError(
+                    p.returncode,
+                    args,
+                    stdout,
+                    stderr)
+
+
 class Screenshotter:
     def __init__(self, temp_storage):
         self._temp = temp_storage
@@ -32,20 +50,16 @@ class Screenshotter:
         ff_path = _path_to_modern_firefox()
         with self._temp.new_folder() as profile_dir:
             try:
-                subprocess.check_call(
-                    [
-                        ff_path,
-                        '--screenshot',
-                        output.name,
-                        url,
-                        '--no-remote',
-                        '--profile',
-                        profile_dir
-                    ],
-                    stdout=None,
-                    stderr=None,
-                    timeout=2
-                )
+                args = [
+                    ff_path,
+                    '--screenshot',
+                    output.name,
+                    url,
+                    '--no-remote',
+                    '--profile',
+                    profile_dir
+                ]
+                _call_quietly(args, timeout=2)
             except subprocess.TimeoutExpired:
                 return None
             except:

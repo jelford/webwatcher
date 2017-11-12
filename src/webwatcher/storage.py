@@ -27,8 +27,12 @@ class StorageFailureException(Exception):
 
 
 class Storage:
-    def __init__(self):
-        self._storage_dir = data_folder('storage')
+    def __init__(self, storage_root=None):
+        if storage_root is None:
+            self._storage_dir = data_folder('storage')
+        else:
+            self._storage_dir = storage_root
+        
         self._meta_info_path = self._storage_dir / 'record.dat'
         self._artefact_storage_dir = self._storage_dir / 'artefacts'
 
@@ -87,6 +91,7 @@ class StorageQuery:
         self.filter_args = filter_args
         self.required_fields = []
         self.order_fields = []
+        self.desc = False
 
     def having(self, *args):
         self.required_fields = args
