@@ -1,0 +1,6 @@
+# Do boring stuff like:
+# * enable error detection, 
+# * check we're running a vaguely sane Python
+
+set -eu
+python -c 'import sys; assert sys.version_info >= (3,5,)'

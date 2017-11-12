@@ -1,0 +1,13 @@
+language: python
+python:
+  - "3.5"
+  - "3.6"
+
+before_install:
+  - ci/before_install.sh
+
+install:
+  - ci/install.sh
+
+script:
+  - ci/test.sh
