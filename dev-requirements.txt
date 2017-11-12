@@ -1,0 +1,3 @@
+mypy
+autopep8
+pep8
