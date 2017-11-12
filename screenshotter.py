@@ -1,16 +1,18 @@
 import functools
+import logging
 import os
-from pathlib import Path
 import re
 import shutil
 import subprocess
+import tarfile
 import tempfile
-import atexit
 
 import attr
 import requests
 
+import environment
 from filehash import file_hash
+from http_session import http_session
 from observation import Screenshot
 
 
@@ -30,8 +32,8 @@ class Screenshotter:
             suffix='.png', dir=self.temp_dir, delete=False)
         output.close()
 
+        ff_path = _path_to_modern_firefox()
         with tempfile.TemporaryDirectory(suffix='_ff_profile') as profile_dir:
-            ff_path = _path_to_modern_firefox()
             try:
                 subprocess.check_call(
                     [
@@ -49,6 +51,9 @@ class Screenshotter:
                 )
             except subprocess.TimeoutExpired:
                 return None
+            except:
+                logging.warn('Error while calling to firefox at: {}', ff_path)
+                raise
 
         return Screenshot(
             content_hash=file_hash(output.name).hexdigest(),
@@ -56,14 +61,14 @@ class Screenshotter:
 
 
 def _download_firefox_package():
-    webwatcher_cache_dir = Path.home() / '.cache' / 'webwatcher'
-    extracted_firefox_bin = webwatcher_cache_dir / 'firefox' / 'firefox'
+    firefox_extraction_path = environment.cache_folder('firefox')
+    extracted_firefox_bin = firefox_extraction_path / 'firefox' / 'firefox'
 
     if extracted_firefox_bin.is_file():
         if os.access(extracted_firefox_bin, os.X_OK):
             return extracted_firefox_bin
 
-    download_cache_dir = webwatcher_cache_dir / 'downloads'
+    download_cache_dir = environment.cache_folder('downloads')
     try:
         os.makedirs(download_cache_dir)
     except FileExistsError:
@@ -75,6 +80,10 @@ def _download_firefox_package():
         downloaded_hash = file_hash(download_path).hexdigest()
         need_to_download = downloaded_hash != _FIREFOX_BETA_DOWNLOAD_HASH
     else:
+        logging.debug('Need to download firefox as the following'
+                      'arent present or dont hash right:',
+                      download_path, extracted_firefox_bin)
+
         need_to_download = True
 
     if need_to_download:
@@ -85,7 +94,7 @@ def _download_firefox_package():
                 shutil.copyfileobj(r.raw, download_file)
 
     downloaded_package = tarfile.open(name=download_path, mode='r:bz2')
-    downloaded_package.extractall(path=webwatcher_cache_dir)
+    downloaded_package.extractall(path=firefox_extraction_path)
 
     return extracted_firefox_bin
 

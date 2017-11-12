@@ -6,10 +6,10 @@ import base64
 from datetime import datetime, date
 import json
 import os
-from pathlib import Path
 import shutil
 from urllib.parse import urlparse, unquote
 
+import environment
 from filehash import file_hash
 
 
@@ -27,7 +27,7 @@ class StorageFailureException(Exception):
 
 
 class Storage:
-    _storage_dir = Path.home() / '.local' / 'webwatcher' / 'storage'
+    _storage_dir = environment.data_folder('storage')
     _meta_info_path = _storage_dir / 'record.dat'
     _artefact_storage_dir = _storage_dir / 'artefacts'
 

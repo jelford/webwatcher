@@ -39,8 +39,7 @@ def get_previous_observation(storage: Storage, page: PageUnderObsevation) \
 
     screenshot_content_hash = persisted_data['screenshot_content']
     if screenshot_content_hash is not None:
-        screenshot = Screenshot(
-                        content_hash=screenshot_content_hash)
+        screenshot = Screenshot(content_hash=screenshot_content_hash)
     else:
         screenshot = None
 
@@ -87,7 +86,7 @@ def main() -> None:
         fetcher = WebFetcher(temp_dir)
         watcher = WebWatcher(screenshotter, fetcher)
         diffs = dict()
-        errors = []
+        errors = dict()
         for page in watched_pages():
             try:
                 observation = watcher.observe(page)
@@ -97,9 +96,7 @@ def main() -> None:
                     diffs[page.url] = diff
                 storage.persist(observation)
             except Exception as ex:
-                msg = getattr(ex, 'msg', str(type(ex)))
-                errors.append(
-                    ('{} while checking on {}'.format(msg, page.url), ex))
+                errors[page.url] = ex
 
         for url, diff in diffs.items():
             print('Differences in {url}'.format(url=url))
@@ -108,9 +105,12 @@ def main() -> None:
 
         if errors:
             print('Errors:')
-        for msg, e in errors:
-            print('\t', msg)
-            raise e
+        for url, e in errors.items():
+            print('While inspecting', url)
+            print('\t {type} {args}'.format(type=type(e), args=e.args))
+        if errors:
+            raise next(iter(errors.values()))
+
 
 if __name__ == '__main__':
     main()

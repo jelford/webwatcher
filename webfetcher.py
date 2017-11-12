@@ -1,10 +1,10 @@
 
-import shutil
 import requests
 from requests.exceptions import ConnectionError
+import shutil
 import tempfile
 
-http_session = requests.session()
+from http_session import http_session
 
 
 class WebFetcher:
