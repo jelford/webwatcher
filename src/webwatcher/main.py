@@ -17,6 +17,7 @@ from webwatcher.diffa import Diffa
 from webwatcher.observation import PageObservation, Screenshot
 from webwatcher.screenshotter import Screenshotter
 from webwatcher.storage import Storage
+from webwatcher.temporarystorage import temporary_storage
 from webwatcher.webfetcher import WebFetcher
 
 
@@ -79,11 +80,11 @@ def watched_pages() -> Collection[PageUnderObsevation]:
 
 
 def main() -> None:
-    with tempfile.TemporaryDirectory() as temp_dir:
+    with temporary_storage() as temp_storage:
         diffa = Diffa()
         storage = Storage()
-        screenshotter = Screenshotter(temp_dir)
-        fetcher = WebFetcher(temp_dir)
+        screenshotter = Screenshotter(temp_storage)
+        fetcher = WebFetcher(temp_storage)
         watcher = WebWatcher(screenshotter, fetcher)
         diffs = dict()
         errors = dict()

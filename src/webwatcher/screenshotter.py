@@ -5,7 +5,6 @@ import re
 import shutil
 import subprocess
 import tarfile
-import tempfile
 
 import attr
 import requests
@@ -24,16 +23,14 @@ _FIREFOX_BETA_DOWNLOAD_HASH = \
 
 
 class Screenshotter:
-    def __init__(self, temp_dir):
-        self.temp_dir = temp_dir
+    def __init__(self, temp_storage):
+        self._temp = temp_storage
 
     def take_screenshot_of(self, url: str) -> Screenshot:
-        output = tempfile.NamedTemporaryFile(
-            suffix='.png', dir=self.temp_dir, delete=False)
-        output.close()
+        output = self._temp.new_file(leave_open=False, suffix='.png')
 
         ff_path = _path_to_modern_firefox()
-        with tempfile.TemporaryDirectory(suffix='_ff_profile') as profile_dir:
+        with self._temp.new_folder() as profile_dir:
             try:
                 subprocess.check_call(
                     [

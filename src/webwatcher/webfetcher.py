@@ -8,8 +8,8 @@ from webwatcher.http_session import http_session
 
 
 class WebFetcher:
-    def __init__(self, temp_dir):
-        self.temp_dir = temp_dir
+    def __init__(self, temp):
+        self._temp = temp
 
     def fetch(self, url):
         try:
@@ -18,9 +18,7 @@ class WebFetcher:
             return False, None
         else:
             was_available = response.status_code in range(200, 300)
-            raw_content_file = \
-                tempfile.NamedTemporaryFile(
-                    dir=self.temp_dir, suffix='.raw', delete=False)
+            raw_content_file = self._temp.new_file(delete=False)
             shutil.copyfileobj(response.raw, raw_content_file)
             raw_content_file.flush()
             return True, raw_content_file.name
