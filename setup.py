@@ -17,7 +17,6 @@ setup(
     classifiers=[
         'Develpment Status :: 4 - Alpha',
         'Intended Audience :: Information Technology',
-        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
     ],
 

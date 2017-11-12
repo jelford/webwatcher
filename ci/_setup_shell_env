@@ -3,4 +3,4 @@
 # * check we're running a vaguely sane Python
 
 set -eu
-python -c 'import sys; assert sys.version_info >= (3,5,)'
+python -c 'import sys; assert sys.version_info >= (3,6,)'
