@@ -1,0 +1,4 @@
+discover_modules = true
+
+[modules.requests]
+skip = true

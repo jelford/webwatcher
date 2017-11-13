@@ -1,5 +1,6 @@
 from hashlib import sha256
 import subprocess
+from typing import Dict
 
 from webwatcher.filehash import file_hash
 from webwatcher.observation import PageObservation
@@ -19,7 +20,7 @@ class PageDiff:
         self.screenshot_diff = screenshot_diff
         self.content_diff = content_diff
 
-    def differences(self):
+    def differences(self) -> Dict:
         return {k: v for k, v in {
             'availability': self.availability,
             'screenshot': self.screenshot_diff,

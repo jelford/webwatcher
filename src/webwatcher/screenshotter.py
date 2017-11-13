@@ -6,7 +6,6 @@ import shutil
 import subprocess
 import tarfile
 
-import attr
 import requests
 
 from webwatcher.environment import cache_folder

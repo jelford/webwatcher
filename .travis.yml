@@ -11,4 +11,7 @@ install:
   - ci/install.sh
 
 script:
-  - ci/test.sh
+  - ci/lint.sh
+  - ci/build.sh
+  - ci/test.py
+
