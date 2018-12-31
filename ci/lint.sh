@@ -1,5 +1,5 @@
 #! /usr/bin/env sh
 . ci/_setup_shell_env
 
-mystubs
-mypy src
+pipenv run mystubs
+pipenv run mypy src

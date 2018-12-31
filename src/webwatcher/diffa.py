@@ -1,6 +1,6 @@
 from hashlib import sha256
 import subprocess
-from typing import Dict
+from typing import Dict, Optional
 
 from webwatcher.filehash import file_hash
 from webwatcher.observation import PageObservation
@@ -66,7 +66,7 @@ def _do_diff_on_screenshots(old_screenshot, new_screenshot):
 class Diffa:
     def diff(self,
              new_observation: PageObservation,
-             old_observation: PageObservation) -> PageDiff:
+             old_observation: Optional[PageObservation]) -> Optional[PageDiff]:
 
         if old_observation is None:
             print('No previous found')

@@ -1,0 +1,22 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+pytest = "==3.2.3"
+mypy = ">=0.650"
+mystubs = {git = "https://github.com/jelford/mystubs.git"}
+
+[packages]
+appdirs = "~=1.4.3"
+docopt = "~=0.6.2"
+requests = "~=2.19"
+toml = "~=0.9.2"
+typing-extensions = "~=3.6.2"
+
+[requires]
+python_version = "3.7"
+
+[scripts]
+mypy = "python -m mypy"

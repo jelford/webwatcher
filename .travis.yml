@@ -2,7 +2,11 @@ language: python
 python:
   - "3.6"
 
-cache: pip
+cache: 
+  pip: true
+  directories:
+    - .mypy_cache
+    - .mystubs/
 
 before_install:
   - ci/before_install.sh
@@ -13,5 +17,5 @@ install:
 script:
   - ci/lint.sh
   - ci/build.sh
-  - ci/test.py
+  - ci/test.sh
 
