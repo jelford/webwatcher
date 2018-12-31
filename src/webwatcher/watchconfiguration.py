@@ -54,12 +54,13 @@ def _print_err(msg: str='') -> None:
 
 
 def print_config_template() -> None:
-    print(
-        pkgutil.get_data('webwatcher', 'config.toml.template').decode('utf-8'))
+    config_template = pkgutil.get_data('webwatcher', 'config.toml.template')
+    assert config_template is not None
+    print(config_template.decode('utf-8'))
 
 
 def watched_pages(config_path: Optional[Path]) \
-        -> Iterable[PageUnderObsevation]:
+        -> Optional[Iterable[PageUnderObsevation]]:
     watch_config_path = _find_wach_confguration_path(config_path)
     if watch_config_path:
         config = toml.load(str(watch_config_path))

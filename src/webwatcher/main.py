@@ -24,7 +24,7 @@ import subprocess
 import sys
 import tarfile
 import tempfile
-from typing import Iterable
+from typing import Iterable, Optional
 
 import docopt
 import requests
@@ -41,7 +41,7 @@ from webwatcher.watchconfiguration import \
 
 
 def get_previous_observation(storage: Storage, page: PageUnderObsevation) \
-        -> PageObservation:
+        -> Optional[PageObservation]:
     persisted_data = storage.find(url=page.url) \
         .having('timestamp') \
         .order_by('timestamp',
@@ -54,7 +54,7 @@ def get_previous_observation(storage: Storage, page: PageUnderObsevation) \
 
     screenshot_content_hash = persisted_data['screenshot_content']
     if screenshot_content_hash is not None:
-        screenshot = Screenshot(content_hash=screenshot_content_hash)
+        screenshot : Optional[Screenshot] = Screenshot(content_hash=screenshot_content_hash)
     else:
         screenshot = None
 

@@ -5,7 +5,7 @@ import re
 import shutil
 import subprocess
 import tarfile
-
+from typing import Optional
 import requests
 
 from webwatcher.environment import cache_folder
@@ -43,7 +43,7 @@ class Screenshotter:
     def __init__(self, temp_storage):
         self._temp = temp_storage
 
-    def take_screenshot_of(self, url: str) -> Screenshot:
+    def take_screenshot_of(self, url: str) -> Optional[Screenshot]:
         output = self._temp.new_file(leave_open=False, suffix='.png')
 
         ff_path = _path_to_modern_firefox()
