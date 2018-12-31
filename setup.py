@@ -1,10 +1,16 @@
 from setuptools import setup, find_packages
+import json
 
 with open('version.txt', 'r', encoding='utf-8') as f:
     version = f.read().strip()
 
-with open('requirements.txt', 'r', encoding='utf-8') as f:
-    requirements = [l.strip() for l in f.readlines()]
+def load_requirements():
+    with open('Pipfile.lock', 'rb') as f:
+        requirements_json = json.load(f)
+    return [
+            f'{rname}{rspec["version"]}' for rname, rspec in requirements_json['default'].items()
+    ]
+        
 
 setup(
     name='webwatcher',
@@ -20,7 +26,7 @@ setup(
         'Programming Language :: Python :: 3.6',
     ],
 
-    install_requires=requirements,
+    install_requires=load_requirements(),
     package_dir={'': 'src'},
     packages=find_packages(where='src'),
     entry_points={
