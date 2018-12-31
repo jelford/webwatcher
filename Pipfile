@@ -5,6 +5,7 @@ verify_ssl = true
 
 [dev-packages]
 pytest = "==3.2.3"
+mypy = "*"
 
 [packages]
 appdirs = "~=1.4.3"
@@ -15,3 +16,6 @@ typing-extensions = "~=3.6.2"
 
 [requires]
 python_version = "3.7"
+
+[scripts]
+mypy = "python -m mypy"

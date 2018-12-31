@@ -9,6 +9,7 @@ def load_requirements():
         requirements_json = json.load(f)
     return [
             f'{rname}{rspec["version"]}' for rname, rspec in requirements_json['default'].items()
+            if 'editable' not in rspec
     ]
         
 
