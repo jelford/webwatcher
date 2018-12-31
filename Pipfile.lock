@@ -103,7 +103,7 @@
         },
         "mystubs": {
             "git": "https://github.com/jelford/mystubs.git",
-            "ref": "b1ec63ba6384f0838a26ee9cfdbe35966d60e920"
+            "ref": "65de5d6b7fc1b8e63e09f9664c5ff2ed733da105"
         },
         "py": {
             "hashes": [
