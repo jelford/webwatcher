@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "fcec2fbb66808ad5aba86f16f9bbf1f20dfd6f2a612f91cf9f247e18e15fa067"
+            "sha256": "ac494e800509586578580de818280af38b864e64e36711639e5cbadd94c322a5"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -100,6 +100,10 @@
                 "sha256:b16cabe759f55e3409a7d231ebd2841378fb0c27a5d1994719e340e4f429ac3e"
             ],
             "version": "==0.4.1"
+        },
+        "mystubs": {
+            "git": "https://github.com/jelford/mystubs.git",
+            "ref": "b1ec63ba6384f0838a26ee9cfdbe35966d60e920"
         },
         "py": {
             "hashes": [

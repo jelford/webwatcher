@@ -2,3 +2,6 @@ discover_modules = true
 
 [modules.requests]
 skip = true
+
+[modules.urllib3]
+skip = true
